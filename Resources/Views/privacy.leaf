@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>#(pageTitle) · Aanbiedingspan</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
+    <header class="site-header">
+        <a class="brand" href="/">Aanbiedingspan</a>
+        <nav aria-label="Hoofdnavigatie"><a href="/about">Over Aanbiedingspan</a><a aria-current="page" href="/privacy">Privacy</a></nav>
+    </header>
+    <main id="main-content" class="content-page">
+        <p class="eyebrow">Privacy zonder kleine lettertjes</p>
+        <h1>Jouw keuzes blijven van jou</h1>
+        <p class="lead">Je hebt geen account nodig. We vragen niet om je naam, adres, postcode of locatie.</p>
+
+        <h2>Zoeken zonder profiel</h2>
+        <p>Om recepten te vinden sturen we je keuzes naar onze server. We gebruiken ze alleen om de resultaten voor dat moment te berekenen. We bewaren ze niet en maken geen bezoekersprofiel.</p>
+
+        <h2 id="keuzes-bewaren">Je keuzes bewaren</h2>
+        <p>Vink je “Onthoud mijn keuzes” aan? Dan bewaren we je wizardkeuzes maximaal 90 dagen in <code>localStorage</code>. Dat is opslag in je eigen browser.</p>
+        <p>Zonder vinkje werkt Aanbiedingspan gewoon. Bij je volgende bezoek vul je de wizard opnieuw in. We onthouden een weigering niet.</p>
+        <p>Met “Wizard opnieuw starten” verwijder je de opgeslagen keuzes en de melding dat je toestemming gaf.</p>
+
+        <h2>Cookies</h2>
+        <p>Voor bezoekers gebruiken we geen tracking- of advertentiecookies. De optionele bewaarfunctie gebruikt <code>localStorage</code>, geen cookie.</p>
+
+        <h2>Techniek zonder nieuwsgierigheid</h2>
+        <p>Onze technische logboeken bewaren geen wizardkeuzes, volledige IP-adressen of browserprofielen. We gebruiken geen verborgen trackers of advertentiescripts van anderen.</p>
+
+        <h2>Links naar recepten</h2>
+        <p>Recepten openen op de website van de maker. Vanaf dat moment gelden de privacy- en cookievoorwaarden van die website. We laten vooraf zien naar welke bron je gaat.</p>
+
+        <h2>Vragen over privacy</h2>
+        <p>De verantwoordelijke en het privacyadres worden voor de publieke proef ingevuld. Deze demoversie verzamelt geen berichten.</p>
+        <p><a class="button" href="/">Terug naar de wizard</a></p>
+    </main>
+    <footer class="site-footer"><p>Eerst opmaken, dan slim aanvullen.</p><nav aria-label="Voettekst"><a href="/about">Over Aanbiedingspan</a><a href="/privacy">Privacy</a></nav></footer>
+</body>
+</html>

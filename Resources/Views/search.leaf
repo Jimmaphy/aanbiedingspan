@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Vind recepten met ingrediënten die je al in huis hebt.">
+    <title>#(pageTitle) · Aanbiedingspan</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/app.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
+    <header class="site-header">
+        <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina">Aanbiedingspan</a>
+        <nav aria-label="Hoofdnavigatie">
+            <a href="/about">Over Aanbiedingspan</a>
+            <a href="/privacy">Privacy</a>
+        </nav>
+    </header>
+
+    <main id="main-content" class="page-shell" data-search-state="#(searchState)">
+        <section class="intro" aria-labelledby="page-heading">
+            <p class="eyebrow">Eerst opmaken, dan slim aanvullen</p>
+            <h1 id="page-heading">#(pageTitle)</h1>
+            <p>Kies wat bij je past. Ingrediënten die je al hebt tellen extra zwaar.</p>
+        </section>
+
+        <form class="search-panel" action="/search" method="post" data-search-form>
+            <div class="wizard-progress" aria-label="Voortgang van de zoekhulp">
+                <span data-step-indicator="1" aria-current="step">1. Gerechtswensen</span>
+                <span data-step-indicator="2">2. Ingrediënten</span>
+                <span data-step-indicator="3">3. Supermarkten</span>
+            </div>
+
+            <fieldset class="wizard-step" data-step="1">
+                <legend>Welke gerechtswensen heb je?</legend>
+                <p class="field-help">Je mag meerdere keuzes aanvinken. Zonder keuze tonen we alle soorten recepten.</p>
+                <div class="choice-grid">
+                    #for(option in dietaryPreferences):
+                    <label class="choice-card">
+                        <input type="checkbox" name="dietaryPreferences[]" value="#(option.id)" #(option.checkedAttribute)>
+                        <span>#(option.name)</span>
+                    </label>
+                    #endfor
+                </div>
+            </fieldset>
+
+            <fieldset class="wizard-step" data-step="2">
+                <legend>Wat heb je al in huis?</legend>
+                <p class="field-help">Kies ook wat je niet lust of niet mag. Een ingrediënt kan maar in één lijst staan.</p>
+                <div class="ingredient-columns">
+                    <div>
+                        <h2>In huis</h2>
+                        <div class="choice-list">
+                            #for(ingredient in ingredients):
+                            <label>
+                                <input type="checkbox" name="pantryIngredients[]" value="#(ingredient.id)" data-exclusive-group="pantry" #(ingredient.pantryCheckedAttribute)>
+                                <span>#(ingredient.name)</span>
+                            </label>
+                            #endfor
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Niet gebruiken</h2>
+                        <div class="choice-list">
+                            #for(ingredient in ingredients):
+                            <label>
+                                <input type="checkbox" name="excludedIngredients[]" value="#(ingredient.id)" data-exclusive-group="excluded" #(ingredient.excludedCheckedAttribute)>
+                                <span>#(ingredient.name)</span>
+                            </label>
+                            #endfor
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="wizard-step" data-step="3">
+                <legend>Bij welke supermarkten wil je kijken?</legend>
+                <p class="field-help">We vragen niet waar je woont. Je kiest alleen supermarktketens.</p>
+                <div class="choice-grid">
+                    #for(option in supermarkets):
+                    <label class="choice-card">
+                        <input type="checkbox" name="supermarkets[]" value="#(option.id)" #(option.checkedAttribute)>
+                        <span>#(option.name)</span>
+                    </label>
+                    #endfor
+                </div>
+
+                <div class="storage-choice">
+                    <label>
+                        <input type="checkbox" data-storage-consent>
+                        <span><strong>Onthoud mijn keuzes voor een volgend bezoek</strong><br>Aanbiedingspan bewaart je keuzes dan 90 dagen in deze browser.</span>
+                    </label>
+                    <button type="button" class="info-button" data-storage-info aria-expanded="false" aria-controls="storage-explanation">Meer uitleg over keuzes bewaren</button>
+                    <div id="storage-explanation" class="storage-explanation" hidden>
+                        <p>Zonder vinkje kun je gewoon zoeken, maar begin je een volgend bezoek opnieuw.</p>
+                        <a href="/privacy&#35;keuzes-bewaren" target="_blank" rel="noopener noreferrer">Lees hoe dit werkt (opent in een nieuw tabblad)</a>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="wizard-actions">
+                <button type="button" class="button button-secondary" data-previous hidden>Vorige</button>
+                <button type="button" class="button" data-next>Volgende</button>
+                <button type="submit" class="button" data-submit>Toon recepten</button>
+                <button type="button" class="text-button" data-reset>Wizard opnieuw starten</button>
+            </div>
+            <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+        </form>
+
+        <section class="results" aria-labelledby="results-heading" aria-live="polite" #(resultsHiddenAttribute)>
+            <div class="results-heading">
+                <div>
+                    <p class="eyebrow">Je beste voorraadmatches</p>
+                    <h2 id="results-heading" tabindex="-1">#(resultCount) recepten gevonden</h2>
+                </div>
+                <button type="button" class="button button-secondary" data-edit-filters>Filters aanpassen</button>
+            </div>
+
+            <div class="recipe-grid" #(recipeGridHiddenAttribute)>
+                #for(result in results):
+                <article class="recipe-card">
+                    <img src="#(result.imagePath)" alt="" width="640" height="360">
+                    <div class="recipe-card-content">
+                        <div class="score" aria-label="#(result.matchPercentage) procent match">
+                            <strong>#(result.matchPercentage)%</strong>
+                            <span>match</span>
+                        </div>
+                        <h3>#(result.title)</h3>
+                        <p>#(result.summary)</p>
+                        <p class="recipe-meta">#(result.durationMinutes) minuten · #(result.pantryCount) in huis · #(result.offerCount) in aanbieding · #(result.neededCount) nog nodig</p>
+                        <ul class="tag-list" aria-label="Gerechtswensen">
+                            #for(preference in result.dietaryPreferences):<li>#(preference)</li>#endfor
+                        </ul>
+                        <h4>Ingrediënten</h4>
+                        <ul class="ingredient-status-list">
+                            #for(ingredient in result.ingredients):
+                            <li>
+                                <span>#(ingredient.displayText)</span>
+                                <span class="status #(ingredient.statusClass)">#(ingredient.statusText)</span>
+                            </li>
+                            #endfor
+                        </ul>
+                        <a class="button card-link" href="#(result.sourceURL)" target="_blank" rel="noopener noreferrer external">Bekijk bij #(result.sourceName) (opent in een nieuw tabblad)</a>
+                    </div>
+                </article>
+                #endfor
+            </div>
+            <div class="empty-state" #(emptyStateHiddenAttribute)>
+                <h3>Deze combinatie levert nog geen recept op</h3>
+                <p>Pas een gerechtswens aan of haal een ingrediënt uit “Niet gebruiken”.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>Eerst opmaken, dan slim aanvullen.</p>
+        <nav aria-label="Voettekst">
+            <a href="/about">Over Aanbiedingspan</a>
+            <a href="/privacy">Privacy</a>
+        </nav>
+    </footer>
+</body>
+</html>

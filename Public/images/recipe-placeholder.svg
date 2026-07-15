@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title description">
+  <title id="title">Kom met verse ingrediënten</title>
+  <desc id="description">Eenvoudige illustratie van een kom met groene bladeren en tomaten.</desc>
+  <rect width="640" height="360" fill="#f1f4e8"/>
+  <circle cx="210" cy="132" r="45" fill="#b94f2c"/>
+  <circle cx="430" cy="130" r="38" fill="#d77748"/>
+  <path d="M160 165c40-100 120-98 150 2-56 14-103 12-150-2Z" fill="#4d8057"/>
+  <path d="M330 170c30-92 112-110 150-8-50 22-98 25-150 8Z" fill="#2f643f"/>
+  <path d="M112 190h416c-12 96-79 130-208 130S124 286 112 190Z" fill="#fffaf0" stroke="#243127" stroke-width="8"/>
+  <path d="M120 190h400" stroke="#243127" stroke-width="8" stroke-linecap="round"/>
+</svg>
