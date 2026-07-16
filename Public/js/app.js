@@ -89,7 +89,7 @@
             });
             previousButton.hidden = currentStep === 1;
             nextButton.hidden = currentStep === steps.length;
-            submitButton.hidden = currentStep !== steps.length;
+            submitButton.hidden = false;
         }
 
         function showFilterMode() {

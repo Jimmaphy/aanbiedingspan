@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">Aanbiedingspan</title>
+  <desc id="description">Een groene koekenpan met het bovenste deel van een euroteken</desc>
+  <path fill="#f3cf83" d="M9 29a23 23 0 0 1 46 0v4H9z"/>
+  <path fill="#2f643f" d="M10 31h44v5c0 11-9 20-20 20h-4c-11 0-20-9-20-20zm44 2h7a3 3 0 0 1 0 6h-8z"/>
+  <path fill="none" stroke="#fffaf0" stroke-linecap="round" stroke-width="4.5" d="M43 14c-3-3-6-4-10-4-7 0-12 5-13 15m-3-7h20m-20 7h18"/>
+</svg>

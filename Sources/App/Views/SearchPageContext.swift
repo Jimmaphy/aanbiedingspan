@@ -13,12 +13,6 @@ struct IngredientOptionContext: Encodable {
   let excludedCheckedAttribute: String
 }
 
-struct IngredientMatchContext: Encodable {
-  let displayText: String
-  let statusClass: String
-  let statusText: String
-}
-
 struct RecipeCardContext: Encodable {
   let id: String
   let title: String
@@ -26,13 +20,34 @@ struct RecipeCardContext: Encodable {
   let imagePath: String
   let sourceURL: String
   let sourceName: String
-  let durationMinutes: Int
   let dietaryPreferences: [String]
   let matchPercentage: Int
-  let pantryCount: Int
-  let offerCount: Int
-  let neededCount: Int
-  let ingredients: [IngredientMatchContext]
+  let detailsHTML: String
+
+  static func makeDetailsHTML(
+    durationMinutes: Int,
+    ingredientCount: Int,
+    pantryCount: Int,
+    offerCount: Int
+  ) -> String {
+    let ingredientLabel = ingredientCount == 1 ? "ingrediënt" : "ingrediënten"
+    let duration = "<strong>\(durationMinutes) minuten</strong>"
+    let ingredients = "<strong>\(ingredientCount) \(ingredientLabel)"
+
+    switch (pantryCount > 0, offerCount > 0) {
+    case (false, false):
+      return "\(duration) werk met \(ingredients).</strong>"
+    case (false, true):
+      return
+        "\(duration) werk met \(ingredients)</strong>, waarvan <strong>\(offerCount) in de aanbieding.</strong>"
+    case (true, false):
+      return
+        "\(duration) werk met \(ingredients)</strong>, waarvan <strong>\(pantryCount) in huis.</strong>"
+    case (true, true):
+      return
+        "\(duration) werk met \(ingredients)</strong>, waarvan <strong>\(pantryCount) in huis</strong> en <strong>\(offerCount) in de aanbieding.</strong>"
+    }
+  }
 }
 
 struct SearchPageContext: Encodable {
@@ -84,21 +99,15 @@ struct SearchPageContext: Encodable {
         imagePath: result.recipe.imagePath,
         sourceURL: result.recipe.sourceURL,
         sourceName: result.recipe.sourceName,
-        durationMinutes: result.recipe.durationMinutes,
         dietaryPreferences: result.recipe.dietaryPreferenceIDs.compactMap { preferenceNames[$0] }
           .sorted(),
         matchPercentage: result.matchPercentage,
-        pantryCount: result.pantryCount,
-        offerCount: result.offerCount,
-        neededCount: result.neededCount,
-        ingredients: result.ingredients.map { ingredient in
-          let presentation = Self.presentation(for: ingredient.state)
-          return IngredientMatchContext(
-            displayText: ingredient.displayText,
-            statusClass: presentation.className,
-            statusText: presentation.text
-          )
-        }
+        detailsHTML: RecipeCardContext.makeDetailsHTML(
+          durationMinutes: result.recipe.durationMinutes,
+          ingredientCount: result.ingredients.count,
+          pantryCount: result.pantryCount,
+          offerCount: result.offerCount
+        )
       )
     }
     searchState = hasSearched ? "results" : "wizard"
@@ -108,16 +117,6 @@ struct SearchPageContext: Encodable {
     resultCount = results.count
   }
 
-  private static func presentation(for state: IngredientMatchState) -> (
-    className: String, text: String
-  ) {
-    switch state {
-    case .pantryAndOffer: return ("status-combined", "In huis én aanbieding")
-    case .pantry: return ("status-pantry", "In huis")
-    case .offer: return ("status-offer", "In aanbieding")
-    case .needed: return ("status-needed", "Nog nodig")
-    }
-  }
 }
 
 struct InformationPageContext: Encodable {

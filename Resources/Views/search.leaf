@@ -11,11 +11,7 @@
 <body>
     <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
     <header class="site-header">
-        <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina">Aanbiedingspan</a>
-        <nav aria-label="Hoofdnavigatie">
-            <a href="/about">Over Aanbiedingspan</a>
-            <a href="/privacy">Privacy</a>
-        </nav>
+        <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a>
     </header>
 
     <main id="main-content" class="page-shell" data-search-state="#(searchState)">
@@ -26,6 +22,7 @@
         </section>
 
         <form class="search-panel" action="/search" method="post" data-search-form>
+            <input type="hidden" name="search" value="1">
             <div class="wizard-progress" aria-label="Voortgang van de zoekhulp">
                 <span data-step-indicator="1" aria-current="step">1. Gerechtswensen</span>
                 <span data-step-indicator="2">2. Ingrediënten</span>
@@ -33,7 +30,7 @@
             </div>
 
             <fieldset class="wizard-step" data-step="1">
-                <legend>Welke gerechtswensen heb je?</legend>
+                <legend>Welke wensen heb je?</legend>
                 <p class="field-help">Je mag meerdere keuzes aanvinken. Zonder keuze tonen we alle soorten recepten.</p>
                 <div class="choice-grid">
                     #for(option in dietaryPreferences):
@@ -46,7 +43,7 @@
             </fieldset>
 
             <fieldset class="wizard-step" data-step="2">
-                <legend>Wat heb je al in huis?</legend>
+                <legend>Welke ingrediënten kies je?</legend>
                 <p class="field-help">Kies ook wat je niet lust of niet mag. Een ingrediënt kan maar in één lijst staan.</p>
                 <div class="ingredient-columns">
                     <div>
@@ -75,7 +72,7 @@
             </fieldset>
 
             <fieldset class="wizard-step" data-step="3">
-                <legend>Bij welke supermarkten wil je kijken?</legend>
+                <legend>Welke winkels kies je?</legend>
                 <p class="field-help">We vragen niet waar je woont. Je kiest alleen supermarktketens.</p>
                 <div class="choice-grid">
                     #for(option in supermarkets):
@@ -120,27 +117,20 @@
             <div class="recipe-grid" #(recipeGridHiddenAttribute)>
                 #for(result in results):
                 <article class="recipe-card">
-                    <img src="#(result.imagePath)" alt="" width="640" height="360">
-                    <div class="recipe-card-content">
+                    <div class="recipe-image">
+                        <img src="#(result.imagePath)" alt="" width="640" height="360">
                         <div class="score" aria-label="#(result.matchPercentage) procent match">
                             <strong>#(result.matchPercentage)%</strong>
                             <span>match</span>
                         </div>
-                        <h3>#(result.title)</h3>
-                        <p>#(result.summary)</p>
-                        <p class="recipe-meta">#(result.durationMinutes) minuten · #(result.pantryCount) in huis · #(result.offerCount) in aanbieding · #(result.neededCount) nog nodig</p>
+                    </div>
+                    <div class="recipe-card-content">
                         <ul class="tag-list" aria-label="Gerechtswensen">
                             #for(preference in result.dietaryPreferences):<li>#(preference)</li>#endfor
                         </ul>
-                        <h4>Ingrediënten</h4>
-                        <ul class="ingredient-status-list">
-                            #for(ingredient in result.ingredients):
-                            <li>
-                                <span>#(ingredient.displayText)</span>
-                                <span class="status #(ingredient.statusClass)">#(ingredient.statusText)</span>
-                            </li>
-                            #endfor
-                        </ul>
+                        <h3>#(result.title)</h3>
+                        <p class="recipe-meta">#unsafeHTML(result.detailsHTML)</p>
+                        <p>#(result.summary)</p>
                         <a class="button card-link" href="#(result.sourceURL)" target="_blank" rel="noopener noreferrer external">Bekijk bij #(result.sourceName) (opent in een nieuw tabblad)</a>
                     </div>
                 </article>

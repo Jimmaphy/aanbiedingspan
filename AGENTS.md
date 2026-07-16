@@ -64,6 +64,12 @@ framework toe zonder concrete noodzaak en een vastgelegde afweging.
 - Sla geldbedragen op in centen, timestamps in UTC en render lokale tijden bewust.
 - Voorkom N+1-queries en onbegrensde resultaten; meet vóór optimalisatie.
 
+## Open productaantekeningen
+
+- Ontwerp vóór uitbreiding van de ingrediëntencatalogus een schaalbare zoek- en
+  selectiemethode. Toon een grote catalogus, bijvoorbeeld circa 50 ingrediënten,
+  niet als twee volledige lijsten waarin de gebruiker handmatig moet zoeken.
+
 ## Rankingregels
 
 De specificatie in `docs/IMPLEMENTATIEPLAN.md` is leidend. Wijzig het gewicht of de
