@@ -1,0 +1,8 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>#(pageTitle) · Aanbiedingspan</title><link rel="stylesheet" href="/css/app.css"></head>
+<body><a class="skip-link" href="#main-content">Ga naar de inhoud</a><header class="site-header"><a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a></header>
+<main id="main-content" class="admin-narrow"><p class="eyebrow">Beveiligd beheer</p><h1>Inloggen</h1>
+#if(isConfigured):
+#if(errorMessage):<div class="alert" role="alert">#(errorMessage)</div>#endif
+<form class="admin-panel form-stack" action="/admin/login" method="post"><input type="hidden" name="csrfToken" value="#(csrfToken)"><label>Gebruikersnaam<input name="username" autocomplete="username" required maxlength="120"></label><label>Wachtwoord<input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Inloggen</button></form>
+#else:<div class="alert" role="alert"><strong>Beheer is nog niet ingesteld.</strong><p>Stel eerst <code>ADMIN_USERNAME</code> en <code>ADMIN_PASSWORD_HASH</code> in.</p></div>#endif
+</main></body></html>

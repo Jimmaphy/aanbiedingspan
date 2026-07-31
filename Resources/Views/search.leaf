@@ -6,6 +6,7 @@
     <meta name="description" content="Vind recepten met ingrediënten die je al in huis hebt.">
     <title>#(pageTitle) · Aanbiedingspan</title>
     <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/ingredient-picker.js?v=2" defer></script>
     <script src="/js/app.js" defer></script>
 </head>
 <body>
@@ -46,27 +47,37 @@
                 <legend>Welke ingrediënten kies je?</legend>
                 <p class="field-help">Kies ook wat je niet lust of niet mag. Een ingrediënt kan maar in één lijst staan.</p>
                 <div class="ingredient-columns">
-                    <div>
+                    <div class="ingredient-picker" data-ingredient-picker>
                         <h2>In huis</h2>
-                        <div class="choice-list">
+                        <label>Zoek een ingrediënt<input type="search" data-ingredient-search autocomplete="off"></label>
+                        <p class="form-status" data-ingredient-status role="status" aria-live="polite"></p>
+                        <div class="ingredient-results" data-ingredient-results aria-label="Zoekresultaten voor in huis">
                             #for(ingredient in ingredients):
-                            <label>
+                            <label data-ingredient-option data-ingredient-name="#(ingredient.name)">
                                 <input type="checkbox" name="pantryIngredients[]" value="#(ingredient.id)" data-exclusive-group="pantry" #(ingredient.pantryCheckedAttribute)>
                                 <span>#(ingredient.name)</span>
                             </label>
                             #endfor
                         </div>
+                        <h3 class="selection-heading">Geselecteerd voor in huis</h3>
+                        <p class="field-help" data-ingredient-empty>Nog niets gekozen.</p>
+                        <div class="ingredient-selection" data-ingredient-selected></div>
                     </div>
-                    <div>
+                    <div class="ingredient-picker" data-ingredient-picker>
                         <h2>Niet gebruiken</h2>
-                        <div class="choice-list">
+                        <label>Zoek een ingrediënt<input type="search" data-ingredient-search autocomplete="off"></label>
+                        <p class="form-status" data-ingredient-status role="status" aria-live="polite"></p>
+                        <div class="ingredient-results" data-ingredient-results aria-label="Zoekresultaten voor niet gebruiken">
                             #for(ingredient in ingredients):
-                            <label>
+                            <label data-ingredient-option data-ingredient-name="#(ingredient.name)">
                                 <input type="checkbox" name="excludedIngredients[]" value="#(ingredient.id)" data-exclusive-group="excluded" #(ingredient.excludedCheckedAttribute)>
                                 <span>#(ingredient.name)</span>
                             </label>
                             #endfor
                         </div>
+                        <h3 class="selection-heading">Geselecteerd voor niet gebruiken</h3>
+                        <p class="field-help" data-ingredient-empty>Nog niets gekozen.</p>
+                        <div class="ingredient-selection" data-ingredient-selected></div>
                     </div>
                 </div>
             </fieldset>

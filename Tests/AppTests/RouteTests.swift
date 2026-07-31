@@ -14,6 +14,10 @@ final class RouteTests: XCTestCase {
     XCTAssertContains(homeResponse.body.string, "Welke wensen heb je?")
     XCTAssertContains(homeResponse.body.string, "data-submit>Toon recepten</button>")
     XCTAssertContains(homeResponse.body.string, "Onthoud mijn keuzes voor een volgend bezoek")
+    XCTAssertEqual(
+      homeResponse.body.string.components(separatedBy: "data-ingredient-picker").count, 3)
+    XCTAssertContains(homeResponse.body.string, "Geselecteerd voor in huis")
+    XCTAssertContains(homeResponse.body.string, "/js/ingredient-picker.js?v=2")
     XCTAssertFalse(homeResponse.body.string.contains("aria-label=\"Hoofdnavigatie\""))
     XCTAssertContains(homeResponse.body.string, "/images/aanbiedingspan-logo.svg")
     XCTAssertEqual(homeResponse.headers.first(name: .xFrameOptions), "DENY")

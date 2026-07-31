@@ -114,19 +114,6 @@
         }
     }
 
-    function initializeExclusiveIngredients(form) {
-        form.querySelectorAll("[data-exclusive-group]").forEach((input) => {
-            input.addEventListener("change", () => {
-                if (!input.checked) return;
-                const oppositeGroup = input.dataset.exclusiveGroup === "pantry" ? "excluded" : "pantry";
-                const opposite = form.querySelector(
-                    `[data-exclusive-group="${oppositeGroup}"][value="${CSS.escape(input.value)}"]`
-                );
-                if (opposite) opposite.checked = false;
-            });
-        });
-    }
-
     function initializeStorage(form) {
         const storedPreferences = readStoredPreferences();
         applyStoredPreferences(form, storedPreferences);
@@ -197,7 +184,7 @@
 
         form.dataset.initialized = "true";
         initializeStorage(form);
-        initializeExclusiveIngredients(form);
+        window.AanbiedingspanIngredientPicker?.initialize(form);
         initializeWizard(main, form);
         initializeAsyncSearch(main, form);
     }

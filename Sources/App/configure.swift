@@ -7,6 +7,16 @@ public func configure(_ app: Application) async throws {
   app.middleware.use(SecurityHeadersMiddleware())
   app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
+  let secureAdminCookie = app.environment == .production
+  app.sessions.configuration = .init(cookieName: "aanbiedingspan-admin") { sessionID in
+    HTTPCookies.Value(
+      string: sessionID.string,
+      expires: Date(timeIntervalSinceNow: 60 * 60 * 8),
+      maxAge: nil, domain: nil, path: "/admin", isSecure: secureAdminCookie,
+      isHTTPOnly: true, sameSite: .lax)
+  }
+  app.middleware.use(app.sessions.middleware)
+
   app.views.use(.leaf)
   app.leaf.cache.isEnabled = app.environment == .production
 
@@ -19,6 +29,15 @@ public func configure(_ app: Application) async throws {
     tls: .disable
   )
   app.databases.use(.postgres(configuration: databaseConfiguration), as: .psql)
+  app.migrations.add(CreateAdminCatalog())
+  app.migrations.add(CreateOfferIngredients())
+  app.migrations.add(AddRecipeMediaAndPreferences())
+
+  let configuredRole = Environment.get("ADMIN_ROLE") ?? "admin"
+  app.adminAuth = AdminAuthConfiguration(
+    username: Environment.get("ADMIN_USERNAME"),
+    passwordHash: Environment.get("ADMIN_PASSWORD_HASH"),
+    role: ["admin", "editor"].contains(configuredRole) ? configuredRole : "editor")
 
   app.catalog = .demo
   try routes(app)

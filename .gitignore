@@ -8,3 +8,5 @@ DerivedData/
 Package.pins
 *.xcodeproj
 xcuserdata/
+Public/uploads/recipes/*
+!Public/uploads/recipes/.gitkeep
