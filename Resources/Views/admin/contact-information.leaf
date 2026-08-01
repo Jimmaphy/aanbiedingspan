@@ -1,4 +1,6 @@
-<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>#(pageTitle) · Aanbiedingspan</title><link rel="stylesheet" href="/css/app.css?v=2"></head><body><a class="skip-link" href="#main-content">Ga naar de inhoud</a>
-<header class="site-header admin-header"><a class="brand" href="/admin"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan beheer</a><nav aria-label="Beheer"><a href="/admin">Overzicht</a><span>Ingelogd als #(username)</span></nav></header>
+#extend("layouts/admin"):
+#export("head"):<!-- Geen extra paginabronnen. -->#endexport
+#export("body"):
 <main id="main-content" class="admin-narrow"><p class="eyebrow">Websitebeheer</p><h1>#(heading)</h1><p class="lead">Dit adres verschijnt op de pagina “Over Aanbiedingspan”. Zonder adres blijft daar de tijdelijke uitleg staan.</p>
-<form class="admin-panel form-stack" action="/admin/contact-information" method="post"><input type="hidden" name="csrfToken" value="#(csrfToken)"><label>Openbaar e-mailadres<input type="email" name="email" value="#(email)" autocomplete="email" required maxlength="254" placeholder="contact@aanbiedingspan.nl"></label><div class="form-actions"><button class="button" type="submit">Contactgegevens opslaan</button><a href="/admin">Annuleren</a></div></form></main></body></html>
+<form class="admin-panel form-stack" action="/admin/contact-information" method="post"><input type="hidden" name="csrfToken" value="#(csrfToken)"><label>Openbaar e-mailadres<input type="email" name="email" value="#(email)" autocomplete="email" required maxlength="254" placeholder="contact@aanbiedingspan.nl"></label><div class="form-actions"><button class="button" type="submit">Contactgegevens opslaan</button><a href="/admin">Annuleren</a></div></form></main>#endexport
+#endextend

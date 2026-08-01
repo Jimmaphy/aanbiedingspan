@@ -9,11 +9,6 @@ private struct SimpleRecordForm: Content {
   let csrfToken: String?
 }
 
-private struct ContactInformationForm: Content {
-  let email: String
-  let csrfToken: String?
-}
-
 private struct OfferForm: Content {
   let ingredientIDs: [String]?
   let supermarketID: String
@@ -68,45 +63,6 @@ struct AdminController {
         pageTitle: "Beheer", heading: "Administratieportaal",
         introduction: "Beheer hier de gegevens waarmee Aanbiedingspan werkt.",
         username: identity.username, csrfToken: AdminSession.csrfToken(for: request)))
-  }
-
-  func contactInformation(request: Request) async throws -> View {
-    let record = try await ManagedContactInformation.find(
-      ManagedContactInformation.singletonID, on: request.db)
-    return try await request.view.render(
-      "admin/contact-information",
-      AdminContactInformationContext(
-        username: try identity(request).username,
-        csrfToken: AdminSession.csrfToken(for: request),
-        email: record?.email ?? ""))
-  }
-
-  func updateContactInformation(request: Request) async throws -> Response {
-    let form = try request.content.decode(ContactInformationForm.self)
-    try AdminSession.requireCSRF(form.csrfToken, for: request)
-    let email = try AdminValidation.email(form.email)
-    let actor = try identity(request).username
-
-    try await request.db.transaction { database in
-      if let record = try await ManagedContactInformation.find(
-        ManagedContactInformation.singletonID, on: database)
-      {
-        record.email = email
-        try await record.update(on: database)
-        try await AdminAuditEntry(
-          actor: actor, action: "update", entityType: "contact_information",
-          entityID: ManagedContactInformation.singletonID
-        ).save(on: database)
-      } else {
-        let record = ManagedContactInformation(email: email)
-        try await record.save(on: database)
-        try await AdminAuditEntry(
-          actor: actor, action: "create", entityType: "contact_information",
-          entityID: ManagedContactInformation.singletonID
-        ).save(on: database)
-      }
-    }
-    return request.redirect(to: "/admin/contact-information")
   }
 
   // MARK: Ingredients

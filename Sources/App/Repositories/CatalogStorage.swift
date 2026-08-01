@@ -1,7 +1,18 @@
+import Fluent
 import Vapor
 
 private struct CatalogStorageKey: StorageKey {
   typealias Value = any CatalogRepository
+}
+
+extension CatalogRepository {
+  func ingredients(on database: any Database) async throws -> [Ingredient] {
+    try await load(on: database).ingredients
+  }
+
+  func supermarkets(on database: any Database) async throws -> [Supermarket] {
+    try await load(on: database).supermarkets
+  }
 }
 
 extension Application {

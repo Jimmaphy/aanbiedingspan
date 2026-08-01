@@ -31,21 +31,30 @@ struct CreateOfferIngredients: AsyncMigration {
   }
 
   func prepare(on database: Database) async throws {
-    try await database.schema(ManagedOfferIngredient.schema)
-      .id()
-      .field(
-        "offer_id", .uuid, .required,
-        .references(ManagedOffer.schema, "id", onDelete: .cascade)
-      )
-      .field("ingredient_id", .uuid, .required, .references(ManagedIngredient.schema, "id"))
-      .unique(on: "offer_id", "ingredient_id")
-      .create()
+    try await database.transaction { transactionalDatabase in
+      try await transactionalDatabase.schema(ManagedOfferIngredient.schema)
+        .id()
+        .field(
+          "offer_id", .uuid, .required,
+          .references(ManagedOffer.schema, "id", onDelete: .cascade)
+        )
+        .field("ingredient_id", .uuid, .required, .references(ManagedIngredient.schema, "id"))
+        .unique(on: "offer_id", "ingredient_id")
+        .create()
 
-    let existingOffers = try await LegacyOffer.query(on: database).all()
-    for offer in existingOffers {
-      try await ManagedOfferIngredient(
-        offerID: offer.requireID(), ingredientID: offer.$ingredient.id
-      ).save(on: database)
+      let batchSize = 100
+      var offset = 0
+      while true {
+        let offers = try await LegacyOffer.query(on: transactionalDatabase)
+          .sort(\.$id).offset(offset).limit(batchSize).all()
+        for offer in offers {
+          try await ManagedOfferIngredient(
+            offerID: offer.requireID(), ingredientID: offer.$ingredient.id
+          ).save(on: transactionalDatabase)
+        }
+        guard offers.count == batchSize else { break }
+        offset += batchSize
+      }
     }
   }
 

@@ -42,6 +42,10 @@ struct SearchService: Sendable {
     guard conflicts.isEmpty else {
       throw SearchError.conflictingIngredients(conflicts)
     }
+    let offeredIngredientIDs = Set(
+      catalog.offers.lazy
+        .filter { filters.supermarketIDs.contains($0.supermarketID) }
+        .map(\.ingredientID))
 
     return catalog.recipes
       .filter { recipe in
@@ -49,11 +53,13 @@ struct SearchService: Sendable {
           && Set(recipe.ingredients.map(\.ingredientID)).isDisjoint(
             with: filters.excludedIngredientIDs)
       }
-      .map { rank(recipe: $0, filters: filters) }
+      .map { rank(recipe: $0, filters: filters, offeredIngredientIDs: offeredIngredientIDs) }
       .sorted(by: isOrderedBefore)
   }
 
-  private func rank(recipe: Recipe, filters: SearchFilters) -> RankedRecipe {
+  private func rank(
+    recipe: Recipe, filters: SearchFilters, offeredIngredientIDs: Set<String>
+  ) -> RankedRecipe {
     var earnedScore = 0.0
     var maximumScore = 0.0
     var pantryCount = 0
@@ -62,10 +68,7 @@ struct SearchService: Sendable {
 
     let ingredientMatches = recipe.ingredients.map { recipeIngredient in
       let isInPantry = filters.pantryIngredientIDs.contains(recipeIngredient.ingredientID)
-      let isOnOffer = catalog.offers.contains { offer in
-        offer.ingredientID == recipeIngredient.ingredientID
-          && filters.supermarketIDs.contains(offer.supermarketID)
-      }
+      let isOnOffer = offeredIngredientIDs.contains(recipeIngredient.ingredientID)
 
       let state: IngredientMatchState
       let statusScore: Double

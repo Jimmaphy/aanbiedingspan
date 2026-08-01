@@ -14,17 +14,7 @@ struct PageController {
 
   func search(request: Request) async throws -> View {
     let searchRequest = try request.content.decode(SearchRequest.self)
-    let catalog = try await request.application.catalogRepository.load(on: request.db)
-    let results: [RankedRecipe]
-
-    do {
-      results = try SearchService(catalog: catalog).search(filters: searchRequest.filters)
-    } catch SearchError.conflictingIngredients {
-      throw Abort(
-        .badRequest,
-        reason: "Een ingrediënt kan niet tegelijk in huis en uitgesloten zijn. Pas je keuze aan."
-      )
-    }
+    let (catalog, results) = try await SearchRequestExecutor().execute(searchRequest, on: request)
 
     let context = SearchPageContext(
       catalog: catalog,

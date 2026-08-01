@@ -120,6 +120,25 @@ final class AdminDatabaseTests: XCTestCase {
     XCTAssertEqual(publicCatalog.offers.count, 2)
     XCTAssertEqual(Set(publicCatalog.offers.map(\.ingredientID)).count, 2)
 
+    let boundedCatalog = try await ManagedCatalogRepository(
+      limits: .init(
+        ingredients: 2, supermarkets: 2, preferences: 100, recipes: 200,
+        offerRecords: 500, offers: 500)
+    ).load(on: application.db)
+    let boundedIngredientIDs = Set(boundedCatalog.ingredients.map(\.id))
+    let boundedSupermarketIDs = Set(boundedCatalog.supermarkets.map(\.id))
+    XCTAssertEqual(boundedCatalog.ingredients.count, 2)
+    XCTAssertEqual(boundedCatalog.recipes.map(\.title), [recipe.title])
+    XCTAssertTrue(
+      boundedCatalog.recipes.allSatisfy {
+        Set($0.ingredients.map(\.ingredientID)).isSubset(of: boundedIngredientIDs)
+      })
+    XCTAssertTrue(
+      boundedCatalog.offers.allSatisfy {
+        boundedIngredientIDs.contains($0.ingredientID)
+          && boundedSupermarketIDs.contains($0.supermarketID)
+      })
+
     let publicSearch = try await application.sendRequest(
       .POST, "/search",
       beforeRequest: { request in

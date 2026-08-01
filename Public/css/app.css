@@ -105,6 +105,10 @@ h2 { line-height: 1.2; }
 
 .search-panel { padding: clamp(1rem, 4vw, 2rem); }
 .content-page { padding-inline: clamp(1.25rem, 5vw, 3.5rem); }
+.ai-disclosure { display: grid; gap: 1.25rem; align-items: start; }
+.ai-disclosure p { margin-block: 0; }
+.ai-rating-visual { width: min(11rem, 55vw); }
+.ai-rating-badge { display: block; width: min(11rem, 55vw); height: auto; }
 
 .wizard-progress {
     display: grid;
@@ -247,6 +251,9 @@ input[type="checkbox"] { width: 1.35rem; height: 1.35rem; flex: 0 0 auto; margin
     .recipe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .admin-form-layout { grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr); }
     .two-columns { grid-template-columns: 1fr 1fr; }
+    .ai-disclosure { grid-template-columns: minmax(0, 1fr) 11rem; align-items: stretch; }
+    .ai-rating-visual { position: relative; width: 11rem; min-height: 0; }
+    .ai-rating-badge { position: absolute; top: 0; right: 0; width: auto; height: 100%; }
 }
 
 @media (min-width: 64rem) {

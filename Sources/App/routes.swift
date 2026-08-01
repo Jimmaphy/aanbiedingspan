@@ -19,11 +19,12 @@ func routes(_ app: Application) throws {
   app.grouped(AdminErrorMiddleware()).post("admin", "login", use: authController.login)
 
   let adminController = AdminController()
+  let siteSettingsController = SiteSettingsAdminController()
   let admin = app.grouped("admin").grouped(AdminErrorMiddleware(), AdminGuardMiddleware())
   admin.get(use: adminController.dashboard)
   admin.post("logout", use: authController.logout)
-  admin.get("contact-information", use: adminController.contactInformation)
-  admin.post("contact-information", use: adminController.updateContactInformation)
+  admin.get("contact-information", use: siteSettingsController.contactInformation)
+  admin.post("contact-information", use: siteSettingsController.updateContactInformation)
 
   admin.get("ingredients", use: adminController.ingredients)
   admin.get("ingredients", "new", use: adminController.newIngredient)

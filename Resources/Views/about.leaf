@@ -1,16 +1,6 @@
-<!doctype html>
-<html lang="nl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>#(pageTitle) · Aanbiedingspan</title>
-    <link rel="stylesheet" href="/css/app.css?v=2">
-</head>
-<body>
-    <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
-    <header class="site-header">
-        <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a>
-    </header>
+#extend("layouts/public"):
+#export("head"):<!-- Geen extra paginabronnen. -->#endexport
+#export("body"):
     <main id="main-content" class="content-page">
         <p class="eyebrow">De voorraadgedachte</p>
         <h1>Koken met wat er al is</h1>
@@ -31,10 +21,21 @@
         <p>We tellen de punten op en vergelijken ze met de hoogst mogelijke score. Zo ontstaat het matchpercentage. Een recept met vier even belangrijke ingrediënten kan maximaal 12 punten krijgen. Bij 6 punten is de match 50%.</p>
         <p>Gerechtswensen en ingrediënten die je uitsluit controleren we eerst. Een recept dat daar niet aan voldoet, komt niet in de resultaten.</p>
 
+        <section aria-labelledby="ai-gebruik">
+            <h2 id="ai-gebruik">Zo gebruiken we AI</h2>
+            <div class="ai-disclosure">
+                <div>
+                    <p>Deze website is gebouwd met hulp van AI. Ook deze pagina en de privacypagina zijn met hulp van AI geschreven. De gegevens over ingrediënten, recepten en aanbiedingen vullen we handmatig in. Alles wat met AI is gemaakt, is persoonlijk gecontroleerd.</p>
+                </div>
+                <div class="ai-rating-visual">
+                    <img class="ai-rating-badge" src="/images/realgoodai-rating-level-4.png" alt="RealGoodAI Rating Level 4: Major AI" width="489" height="530">
+                </div>
+            </div>
+        </section>
+
         <h2>Even overleggen?</h2>
         #if(contactEmail):<p>Heb je een vraag, een goed recept of zie je iets dat niet klopt? Mail naar <a href="mailto:#(contactEmail)">#(contactEmail)</a>.</p>#else:<p>De contactadressen worden voor de publieke proef bevestigd. Tot die tijd staat er bewust geen werkend contactadres op deze demoversie.</p>#endif
         <p><a class="button" href="/">Vind een recept</a></p>
     </main>
-    <footer class="site-footer"><p>Eerst opmaken, dan slim aanvullen.</p><nav aria-label="Voettekst"><a href="/about">Over Aanbiedingspan</a><a href="/privacy">Privacy</a></nav></footer>
-</body>
-</html>
+#endexport
+#endextend

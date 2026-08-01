@@ -8,6 +8,7 @@ Deze repository bevat vooralsnog de plannen en projectinstructies:
 
 - [Implementatieplan](docs/IMPLEMENTATIEPLAN.md)
 - [Uitrolplan](docs/UITROLPLAN.md)
+- [Concrete publicatiechecklist](docs/PUBLICATIECHECKLIST.md)
 - [Instructies voor Codex en andere LLM's](AGENTS.md)
 
 ## Status

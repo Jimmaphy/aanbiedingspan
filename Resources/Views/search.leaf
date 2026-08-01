@@ -1,20 +1,11 @@
-<!doctype html>
-<html lang="nl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+#extend("layouts/public"):
+#export("head"):
     <meta name="description" content="Vind recepten met ingrediënten die je al in huis hebt.">
-    <title>#(pageTitle) · Aanbiedingspan</title>
-    <link rel="stylesheet" href="/css/app.css?v=2">
     <script src="/js/ingredient-picker.js?v=5" defer></script>
     <script src="/js/app.js?v=2" defer></script>
-</head>
-<body>
-    <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
-    <header class="site-header">
-        <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a>
-    </header>
+#endexport
 
+#export("body"):
     <main id="main-content" class="page-shell" data-search-state="#(searchState)">
         <section class="intro" aria-labelledby="page-heading">
             <p class="eyebrow">Eerst opmaken, dan slim aanvullen</p>
@@ -158,12 +149,5 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <p>Eerst opmaken, dan slim aanvullen.</p>
-        <nav aria-label="Voettekst">
-            <a href="/about">Over Aanbiedingspan</a>
-            <a href="/privacy">Privacy</a>
-        </nav>
-    </footer>
-</body>
-</html>
+#endexport
+#endextend

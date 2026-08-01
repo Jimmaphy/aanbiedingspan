@@ -1,9 +1,32 @@
+import Fluent
 import XCTVapor
 import XCTest
 
 @testable import App
 
 final class RouteTests: XCTestCase {
+  func testListAPIsUseTargetedCatalogQueries() async throws {
+    let application = try await Application.make(.testing)
+    try await configure(application)
+    application.catalogRepository = ListOnlyCatalogRepository()
+
+    let ingredients = try await application.sendRequest(.GET, "/api/ingredients") { _ in
+      await Task.yield()
+    }
+    XCTAssertEqual(ingredients.status, .ok)
+    XCTAssertEqual(
+      try ingredients.content.decode(IngredientListResponse.self).ingredients.map(\.name),
+      ["Gerichte boon"])
+
+    let supermarkets = try await application.sendRequest(.GET, "/api/supermarkets") { _ in
+      await Task.yield()
+    }
+    XCTAssertEqual(supermarkets.status, .ok)
+    XCTAssertContains(supermarkets.body.string, "Gerichte winkel")
+
+    try await application.asyncShutdown()
+  }
+
   func testPublicRoutesUseConfiguredCatalogRepository() async throws {
     let application = try await Application.make(.testing)
     try await configure(application)
@@ -79,7 +102,7 @@ final class RouteTests: XCTestCase {
     XCTAssertEqual(
       homeResponse.body.string.components(separatedBy: "data-ingredient-picker").count, 3)
     XCTAssertContains(homeResponse.body.string, "Geselecteerd voor in huis")
-    XCTAssertContains(homeResponse.body.string, "/css/app.css?v=2")
+    XCTAssertContains(homeResponse.body.string, "/css/app.css?v=5")
     XCTAssertContains(homeResponse.body.string, "/js/ingredient-picker.js?v=5")
     XCTAssertContains(homeResponse.body.string, "/js/app.js?v=2")
     XCTAssertFalse(homeResponse.body.string.contains("aria-label=\"Hoofdnavigatie\""))
@@ -107,6 +130,12 @@ final class RouteTests: XCTestCase {
     XCTAssertContains(aboutResponse.body.string, "Zo komt je match tot stand")
     XCTAssertContains(aboutResponse.body.string, "De missie")
     XCTAssertContains(aboutResponse.body.string, "jimmaphy.nl")
+    XCTAssertContains(aboutResponse.body.string, "Zo gebruiken we AI")
+    XCTAssertContains(aboutResponse.body.string, "RealGoodAI Rating Level 4")
+    XCTAssertContains(aboutResponse.body.string, "/images/realgoodai-rating-level-4.png")
+    XCTAssertContains(
+      aboutResponse.body.string,
+      "Alles wat met AI is gemaakt, is persoonlijk gecontroleerd.")
     XCTAssertContains(aboutResponse.body.string, "mailto:hallo@aanbiedingspan.nl")
 
     let privacyResponse = try await application.sendRequest(.GET, "/privacy") { _ in
@@ -224,5 +253,40 @@ final class RouteTests: XCTestCase {
     XCTAssertEqual(payload.results.first?.ingredients.first?.state, .pantryAndOffer)
 
     try await application.asyncShutdown()
+  }
+
+  func testSearchAPIRejectsConflictingIngredientsAsBadRequest() async throws {
+    let application = try await Application.make(.testing)
+    try await configure(application)
+
+    let request = SearchRequest(
+      dietaryPreferences: [],
+      pantryIngredients: ["tomato"],
+      excludedIngredients: ["tomato"],
+      supermarkets: []
+    )
+    let response = try await application.sendRequest(
+      .POST, "/api/search",
+      beforeRequest: { requestMessage in
+        try requestMessage.content.encode(request)
+        await Task.yield()
+      })
+
+    XCTAssertEqual(response.status, .badRequest)
+    try await application.asyncShutdown()
+  }
+}
+
+private struct ListOnlyCatalogRepository: CatalogRepository {
+  func load(on database: any Database) async throws -> Catalog {
+    throw Abort(.internalServerError, reason: "De volledige catalogus mag hier niet laden.")
+  }
+
+  func ingredients(on database: any Database) async throws -> [Ingredient] {
+    [.init(id: "targeted-ingredient", name: "Gerichte boon")]
+  }
+
+  func supermarkets(on database: any Database) async throws -> [Supermarket] {
+    [.init(id: "targeted-supermarket", name: "Gerichte winkel")]
   }
 }

@@ -1,16 +1,6 @@
-<!doctype html>
-<html lang="nl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>#(pageTitle) · Aanbiedingspan</title>
-    <link rel="stylesheet" href="/css/app.css?v=2">
-</head>
-<body>
-    <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
-    <header class="site-header">
-        <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a>
-    </header>
+#extend("layouts/public"):
+#export("head"):<!-- Geen extra paginabronnen. -->#endexport
+#export("body"):
     <main id="main-content" class="content-page">
         <p class="eyebrow">Privacy zonder kleine lettertjes</p>
         <h1>Jouw keuzes blijven van jou</h1>
@@ -35,6 +25,5 @@
         <p>De verantwoordelijke en het privacyadres worden voor de publieke proef ingevuld. Deze demoversie verzamelt geen berichten.</p>
         <p><a class="button" href="/">Terug naar de wizard</a></p>
     </main>
-    <footer class="site-footer"><p>Eerst opmaken, dan slim aanvullen.</p><nav aria-label="Voettekst"><a href="/about">Over Aanbiedingspan</a><a href="/privacy">Privacy</a></nav></footer>
-</body>
-</html>
+#endexport
+#endextend
