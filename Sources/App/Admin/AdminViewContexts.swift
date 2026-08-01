@@ -22,6 +22,14 @@ struct AdminErrorContext: Encodable {
   let backPath: String
 }
 
+struct AdminContactInformationContext: Encodable {
+  let pageTitle = "Contactgegevens"
+  let heading = "Contactgegevens"
+  let username: String
+  let csrfToken: String
+  let email: String
+}
+
 struct AdminListItemContext: Encodable {
   let id: String
   let title: String
@@ -75,6 +83,7 @@ struct AdminOfferFormContext: Encodable {
   let supermarkets: [AdminOptionContext]
   let validFrom: String
   let validUntil: String
+  let publishedCheckedAttribute: String
   let errorMessage: String?
 }
 
@@ -93,5 +102,6 @@ struct AdminRecipeFormContext: Encodable {
   let sources: [AdminOptionContext]
   let ingredients: [AdminOptionContext]
   let dietaryPreferences: [AdminOptionContext]
+  let publishedCheckedAttribute: String
   let errorMessage: String?
 }

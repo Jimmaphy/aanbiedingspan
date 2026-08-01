@@ -1,6 +1,23 @@
 import Fluent
 import Vapor
 
+final class ManagedContactInformation: Model, @unchecked Sendable {
+  static let schema = "contact_information"
+  static let singletonID = UUID(uuidString: "24488924-2545-4C79-98EC-057432763E84")!
+
+  @ID(key: .id) var id: UUID?
+  @Field(key: "email") var email: String
+  @Timestamp(key: "created_at", on: .create) var createdAt: Date?
+  @Timestamp(key: "updated_at", on: .update) var updatedAt: Date?
+
+  init() {}
+
+  init(email: String) {
+    id = Self.singletonID
+    self.email = email
+  }
+}
+
 final class ManagedIngredient: Model, @unchecked Sendable {
   static let schema = "ingredients"
   @ID(key: .id) var id: UUID?
@@ -52,6 +69,7 @@ final class ManagedRecipe: Model, @unchecked Sendable {
   @Field(key: "summary") var summary: String
   @Field(key: "source_url") var sourceURL: String
   @Field(key: "duration_minutes") var durationMinutes: Int
+  @Field(key: "is_published") var isPublished: Bool
   @OptionalField(key: "image_path") var imagePath: String?
   @Parent(key: "source_id") var source: RecipeSourceRecord
   @Siblings(through: ManagedRecipeIngredient.self, from: \.$recipe, to: \.$ingredient)
@@ -64,7 +82,7 @@ final class ManagedRecipe: Model, @unchecked Sendable {
   init() {}
   init(
     id: UUID? = nil, title: String, summary: String, sourceURL: String,
-    durationMinutes: Int, sourceID: UUID, imagePath: String? = nil
+    durationMinutes: Int, sourceID: UUID, imagePath: String? = nil, isPublished: Bool = false
   ) {
     self.id = id
     self.title = title
@@ -72,6 +90,7 @@ final class ManagedRecipe: Model, @unchecked Sendable {
     self.sourceURL = sourceURL
     self.durationMinutes = durationMinutes
     self.imagePath = imagePath
+    self.isPublished = isPublished
     self.$source.id = sourceID
   }
 }
@@ -126,13 +145,14 @@ final class ManagedOffer: Model, @unchecked Sendable {
   var ingredients: [ManagedIngredient]
   @Field(key: "valid_from") var validFrom: Date
   @Field(key: "valid_until") var validUntil: Date
+  @Field(key: "is_published") var isPublished: Bool
   @Timestamp(key: "created_at", on: .create) var createdAt: Date?
   @Timestamp(key: "updated_at", on: .update) var updatedAt: Date?
   @Timestamp(key: "deleted_at", on: .delete) var deletedAt: Date?
   init() {}
   init(
     id: UUID? = nil, legacyIngredientID: UUID, supermarketID: UUID,
-    validFrom: Date, validUntil: Date
+    validFrom: Date, validUntil: Date, isPublished: Bool = false
   ) {
     self.id = id
     self.$legacyIngredient.id = legacyIngredientID
@@ -140,6 +160,7 @@ final class ManagedOffer: Model, @unchecked Sendable {
     self.legacyPriceCents = nil
     self.validFrom = validFrom
     self.validUntil = validUntil
+    self.isPublished = isPublished
   }
 }
 

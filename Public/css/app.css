@@ -148,9 +148,11 @@ input[type="checkbox"] { width: 1.35rem; height: 1.35rem; flex: 0 0 auto; margin
 .ingredient-picker input[type="search"] { width: 100%; min-height: 2.8rem; padding: .65rem .75rem; border: 1px solid #7b877e; border-radius: .45rem; background: #fff; color: var(--text); font: inherit; }
 .ingredient-results,
 .ingredient-selection { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .5rem; }
-.ingredient-results { max-height: 20rem; overflow: auto; padding: .25rem; border-bottom: 1px solid var(--border); }
+.ingredient-results { max-height: 20rem; overflow: auto; padding: .25rem; }
 .ingredient-results label,
 .ingredient-selection label { display: flex; align-items: center; gap: .5rem; padding: .65rem; border: 1px solid var(--border); border-radius: .5rem; background: var(--surface); font-weight: 500; cursor: pointer; }
+.ingredient-results label:focus-within,
+.ingredient-selection label:focus-within { border-color: var(--focus); box-shadow: 0 0 0 .12rem var(--focus); }
 .selection-heading { margin: 1.25rem 0 .5rem; font-size: 1rem; }
 
 .storage-choice { margin-top: 1.5rem; padding: 1rem; border-radius: .75rem; background: var(--surface-soft); }
@@ -187,13 +189,13 @@ input[type="checkbox"] { width: 1.35rem; height: 1.35rem; flex: 0 0 auto; margin
 .recipe-card { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .recipe-image { position: relative; }
 .recipe-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-soft); }
-.recipe-card-content { padding: 1.25rem; }
-.recipe-card h3 { font-size: 1.45rem; }
+.recipe-card-content { padding: .9rem 1rem 1rem; }
+.recipe-card h3 { margin: 0; font-size: 1.3rem; line-height: 1.2; }
 .score { position: absolute; top: .75rem; left: .75rem; display: grid; min-width: 4.4rem; padding: .4rem .65rem; border-radius: .65rem; background: rgb(255 255 255 / 92%); box-shadow: 0 .25rem 1rem rgb(36 49 39 / 18%); text-align: center; color: var(--primary-dark); }
 .score strong { font-size: 1.45rem; }
 .score span { font-size: .8rem; }
-.recipe-meta { color: var(--muted); }
-.tag-list { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; list-style: none; }
+.recipe-meta { margin: .15rem 0 1rem; color: var(--muted); line-height: 1.45; }
+.tag-list { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .55rem; padding: 0; list-style: none; }
 .tag-list li { padding: .25rem .6rem; border-radius: 2rem; background: var(--surface-soft); }
 .card-link { width: 100%; margin-top: 1rem; text-align: center; }
 .empty-state { margin-top: 1rem; padding: 2rem; border-radius: var(--radius); background: var(--surface-soft); text-align: center; }
@@ -229,9 +231,11 @@ input[type="checkbox"] { width: 1.35rem; height: 1.35rem; flex: 0 0 auto; margin
 .form-stack input:not([type="checkbox"]), .form-stack select, .form-stack textarea { width: 100%; min-height: 2.8rem; padding: .65rem .75rem; border: 1px solid #7b877e; border-radius: .45rem; background: #fff; color: var(--text); font: inherit; }
 .form-stack textarea { resize: vertical; }
 .admin-form-layout { display: grid; gap: 1.25rem; align-items: start; }
-.quick-create { display: grid; gap: 1.5rem; background: var(--surface-soft); }
+.quick-create { display: grid; gap: 1rem; background: var(--surface-soft); }
 .quick-create h2 { margin: 0; }
-.quick-create form + form { padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.quick-create form { gap: .75rem; }
+.quick-create [data-quick-status]:empty { display: none; }
+.quick-create form + form { padding-top: 1rem; border-top: 1px solid var(--border); }
 .two-columns { display: grid; gap: 1rem; }
 .current-recipe-image img { display: block; width: min(100%, 20rem); height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: .65rem; }
 .alert { margin-bottom: 1rem; padding: 1rem; border: 2px solid #9b2c2c; border-radius: .65rem; background: #fff4f2; color: #611919; }
@@ -243,6 +247,10 @@ input[type="checkbox"] { width: 1.35rem; height: 1.35rem; flex: 0 0 auto; margin
     .recipe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .admin-form-layout { grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr); }
     .two-columns { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 64rem) {
+    .recipe-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 38rem) {

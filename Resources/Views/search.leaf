@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Vind recepten met ingrediënten die je al in huis hebt.">
     <title>#(pageTitle) · Aanbiedingspan</title>
-    <link rel="stylesheet" href="/css/app.css">
-    <script src="/js/ingredient-picker.js?v=2" defer></script>
-    <script src="/js/app.js" defer></script>
+    <link rel="stylesheet" href="/css/app.css?v=2">
+    <script src="/js/ingredient-picker.js?v=5" defer></script>
+    <script src="/js/app.js?v=2" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
@@ -20,7 +20,11 @@
             <p class="eyebrow">Eerst opmaken, dan slim aanvullen</p>
             <h1 id="page-heading">#(pageTitle)</h1>
             <p>Kies wat bij je past. Ingrediënten die je al hebt tellen extra zwaar.</p>
+            #if(showsExternalLinkNotice):<p class="field-help">Recepten openen in een nieuw tabblad, zodat je hier makkelijk verder zoekt.</p>#endif
         </section>
+        #if(catalogNotice):
+        <div class="alert" role="status">#(catalogNotice)</div>
+        #endif
 
         <form class="search-panel" action="/search" method="post" data-search-form>
             <input type="hidden" name="search" value="1">
@@ -142,7 +146,7 @@
                         <h3>#(result.title)</h3>
                         <p class="recipe-meta">#unsafeHTML(result.detailsHTML)</p>
                         <p>#(result.summary)</p>
-                        <a class="button card-link" href="#(result.sourceURL)" target="_blank" rel="noopener noreferrer external">Bekijk bij #(result.sourceName) (opent in een nieuw tabblad)</a>
+                        <a class="button card-link" href="#(result.sourceURL)" target="_blank" rel="noopener noreferrer external">Bekijk bij #(result.sourceName)</a>
                     </div>
                 </article>
                 #endfor

@@ -32,6 +32,8 @@ public func configure(_ app: Application) async throws {
   app.migrations.add(CreateAdminCatalog())
   app.migrations.add(CreateOfferIngredients())
   app.migrations.add(AddRecipeMediaAndPreferences())
+  app.migrations.add(AddPublishingStatus())
+  app.migrations.add(CreateContactInformation())
 
   let configuredRole = Environment.get("ADMIN_ROLE") ?? "admin"
   app.adminAuth = AdminAuthConfiguration(
@@ -39,6 +41,13 @@ public func configure(_ app: Application) async throws {
     passwordHash: Environment.get("ADMIN_PASSWORD_HASH"),
     role: ["admin", "editor"].contains(configuredRole) ? configuredRole : "editor")
 
-  app.catalog = .demo
+  app.catalogRepository =
+    app.environment == .testing
+    ? StaticCatalogRepository(catalog: .demo)
+    : ManagedCatalogRepository()
+  app.contactInformationRepository =
+    app.environment == .testing
+    ? StaticContactInformationRepository(contactEmail: nil)
+    : ManagedContactInformationRepository()
   try routes(app)
 }

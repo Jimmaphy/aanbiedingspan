@@ -18,8 +18,10 @@ Privacy. Onder `/admin` staat een beveiligd administratieportaal voor ingrediën
 supermarkten, aanbiedingen, recepten, receptbronnen en gerechtswensen. Beheerlijsten
 zijn doorzoekbaar. Recepten ondersteunen gekoppelde gerechtswensen, meerdere
 ingrediënten en een handmatig geüploade JPEG-, PNG- of WebP-afbeelding van maximaal
-5 MB. De publieke zoekpagina gebruikt voorlopig nog herkenbare demodata; publicatie
-uit de beheerdatabase volgt apart.
+5 MB. Recepten en aanbiedingen kunnen als concept worden opgeslagen. Alleen expliciet
+gepubliceerde recepten en actuele, expliciet gepubliceerde aanbiedingen komen vanuit
+de beheerdatabase op de publieke zoekpagina en in de zoek-API. Het beheerportaal
+beheert ook het openbare contactadres voor de pagina “Over Aanbiedingspan”.
 
 ## Lokaal starten
 
@@ -53,5 +55,5 @@ swift test
 swift build -c release
 ```
 
-De publieke demorecepten linken naar `example.com` en zijn geen productiecontent.
-Er zijn geen automatische importadapters opgenomen.
+De snelle HTTP-tests gebruiken herkenbare demodata; normale omgevingen lezen de
+publieke catalogus uit PostgreSQL. Er zijn geen automatische importadapters opgenomen.

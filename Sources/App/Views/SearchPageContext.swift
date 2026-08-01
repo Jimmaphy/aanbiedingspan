@@ -61,6 +61,8 @@ struct SearchPageContext: Encodable {
   let recipeGridHiddenAttribute: String
   let emptyStateHiddenAttribute: String
   let resultCount: Int
+  let catalogNotice: String?
+  let showsExternalLinkNotice: Bool
 
   init(catalog: Catalog, request: SearchRequest, results: [RankedRecipe], hasSearched: Bool) {
     let filters = request.filters
@@ -115,10 +117,21 @@ struct SearchPageContext: Encodable {
     recipeGridHiddenAttribute = results.isEmpty ? "hidden" : ""
     emptyStateHiddenAttribute = results.isEmpty ? "" : "hidden"
     resultCount = results.count
+    catalogNotice =
+      catalog.ingredients.isEmpty || catalog.supermarkets.isEmpty
+      ? "Er staan nog niet genoeg keuzes klaar om te zoeken. Probeer het later opnieuw."
+      : nil
+    showsExternalLinkNotice = hasSearched && !results.isEmpty
   }
 
 }
 
 struct InformationPageContext: Encodable {
   let pageTitle: String
+  let contactEmail: String?
+
+  init(pageTitle: String, contactEmail: String? = nil) {
+    self.pageTitle = pageTitle
+    self.contactEmail = contactEmail
+  }
 }

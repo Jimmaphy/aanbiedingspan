@@ -1,4 +1,4 @@
-<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>#(pageTitle) · Aanbiedingspan</title><link rel="stylesheet" href="/css/app.css"></head>
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>#(pageTitle) · Aanbiedingspan</title><link rel="stylesheet" href="/css/app.css?v=2"></head>
 <body><a class="skip-link" href="#main-content">Ga naar de inhoud</a><header class="site-header"><a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a></header>
 <main id="main-content" class="admin-narrow"><p class="eyebrow">Beveiligd beheer</p><h1>Inloggen</h1>
 #if(isConfigured):

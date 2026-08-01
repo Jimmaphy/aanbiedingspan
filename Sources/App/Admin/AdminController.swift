@@ -9,11 +9,17 @@ private struct SimpleRecordForm: Content {
   let csrfToken: String?
 }
 
+private struct ContactInformationForm: Content {
+  let email: String
+  let csrfToken: String?
+}
+
 private struct OfferForm: Content {
   let ingredientIDs: [String]?
   let supermarketID: String
   let validFrom: String
   let validUntil: String
+  let isPublished: String?
   let csrfToken: String?
 }
 
@@ -39,6 +45,7 @@ private struct RecipeForm: Content {
   let ingredientIDs: [String]?
   let dietaryPreferenceIDs: [String]?
   let image: File?
+  let isPublished: String?
   let csrfToken: String?
 }
 
@@ -61,6 +68,45 @@ struct AdminController {
         pageTitle: "Beheer", heading: "Administratieportaal",
         introduction: "Beheer hier de gegevens waarmee Aanbiedingspan werkt.",
         username: identity.username, csrfToken: AdminSession.csrfToken(for: request)))
+  }
+
+  func contactInformation(request: Request) async throws -> View {
+    let record = try await ManagedContactInformation.find(
+      ManagedContactInformation.singletonID, on: request.db)
+    return try await request.view.render(
+      "admin/contact-information",
+      AdminContactInformationContext(
+        username: try identity(request).username,
+        csrfToken: AdminSession.csrfToken(for: request),
+        email: record?.email ?? ""))
+  }
+
+  func updateContactInformation(request: Request) async throws -> Response {
+    let form = try request.content.decode(ContactInformationForm.self)
+    try AdminSession.requireCSRF(form.csrfToken, for: request)
+    let email = try AdminValidation.email(form.email)
+    let actor = try identity(request).username
+
+    try await request.db.transaction { database in
+      if let record = try await ManagedContactInformation.find(
+        ManagedContactInformation.singletonID, on: database)
+      {
+        record.email = email
+        try await record.update(on: database)
+        try await AdminAuditEntry(
+          actor: actor, action: "update", entityType: "contact_information",
+          entityID: ManagedContactInformation.singletonID
+        ).save(on: database)
+      } else {
+        let record = ManagedContactInformation(email: email)
+        try await record.save(on: database)
+        try await AdminAuditEntry(
+          actor: actor, action: "create", entityType: "contact_information",
+          entityID: ManagedContactInformation.singletonID
+        ).save(on: database)
+      }
+    }
+    return request.redirect(to: "/admin/contact-information")
   }
 
   // MARK: Ingredients
@@ -376,7 +422,7 @@ struct AdminController {
         id: try offer.requireID().uuidString,
         title: "\(offer.supermarket.name) · \(countLabel)",
         detail:
-          "\(AdminValidation.dateString(offer.validFrom)) tot en met \(AdminValidation.dateString(offer.validUntil)) · \(shownNames)\(remaining)"
+          "\(offer.isPublished ? "Gepubliceerd" : "Concept") · \(AdminValidation.dateString(offer.validFrom)) tot en met \(AdminValidation.dateString(offer.validUntil)) · \(shownNames)\(remaining)"
       )
     }
     return try await renderList(
@@ -396,7 +442,8 @@ struct AdminController {
     let values = try await validateOffer(form, request: request)
     let offer = ManagedOffer(
       legacyIngredientID: values.ingredientIDs[0], supermarketID: values.supermarketID,
-      validFrom: values.validFrom, validUntil: values.validUntil)
+      validFrom: values.validFrom, validUntil: values.validUntil,
+      isPublished: form.isPublished == "on")
     let actor = try identity(request).username
     try await request.db.transaction { database in
       try await offer.save(on: database)
@@ -426,6 +473,7 @@ struct AdminController {
     offer.$supermarket.id = values.supermarketID
     offer.validFrom = values.validFrom
     offer.validUntil = values.validUntil
+    offer.isPublished = form.isPublished == "on"
     let offerID = try offer.requireID()
     let actor = try identity(request).username
     try await request.db.transaction { database in
@@ -463,7 +511,9 @@ struct AdminController {
       items: try records.map {
         .init(
           id: try $0.requireID().uuidString, title: $0.title,
-          detail: "\($0.durationMinutes) minuten · \($0.source.name)")
+          detail:
+            "\($0.isPublished ? "Gepubliceerd" : "Concept") · \($0.durationMinutes) minuten · \($0.source.name)"
+        )
       })
   }
 
@@ -480,6 +530,7 @@ struct AdminController {
       title: values.title, summary: values.summary,
       sourceURL: values.url, durationMinutes: values.duration, sourceID: values.sourceID,
       imagePath: imagePath)
+    recipe.isPublished = form.isPublished == "on"
     let actor = try identity(request).username
     do {
       try await request.db.transaction { database in
@@ -520,6 +571,7 @@ struct AdminController {
     recipe.summary = values.summary
     recipe.sourceURL = values.url
     recipe.durationMinutes = values.duration
+    recipe.isPublished = form.isPublished == "on"
     recipe.$source.id = values.sourceID
     if let replacementImagePath { recipe.imagePath = replacementImagePath }
     let recipeID = try recipe.requireID()
@@ -615,7 +667,9 @@ struct AdminController {
           option(try $0.requireID(), $0.name, selectedSupermarket, false)
         },
         validFrom: offer.map { AdminValidation.dateString($0.validFrom) } ?? "",
-        validUntil: offer.map { AdminValidation.dateString($0.validUntil) } ?? "", errorMessage: nil
+        validUntil: offer.map { AdminValidation.dateString($0.validUntil) } ?? "",
+        publishedCheckedAttribute: offer?.isPublished == true ? "checked" : "",
+        errorMessage: nil
       ))
   }
 
@@ -647,6 +701,7 @@ struct AdminController {
         dietaryPreferences: try preferences.map {
           option(try $0.requireID(), $0.name, nil, preferenceIDs.contains(try $0.requireID()))
         },
+        publishedCheckedAttribute: recipe?.isPublished == true ? "checked" : "",
         errorMessage: nil))
   }
 

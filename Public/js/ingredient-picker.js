@@ -10,6 +10,10 @@
     function render(picker) {
         const state = states.get(picker);
         if (!state) return;
+        const focusedInput = picker.contains(document.activeElement)
+            && document.activeElement.matches("input[type='checkbox']")
+            ? document.activeElement
+            : null;
         const query = normalize(state.search.value.trim());
         let resultCount = 0;
         let selectedCount = 0;
@@ -33,6 +37,14 @@
         const selectedText = selectedCount === 1 ? "1 ingrediënt gekozen." : `${selectedCount} ingrediënten gekozen.`;
         const resultText = resultCount === 1 ? "1 zoekresultaat." : `${resultCount} zoekresultaten.`;
         state.status.textContent = query === "" ? selectedText : `${resultText} ${selectedText}`;
+        focusedInput?.focus();
+    }
+
+    function visibleResultInputs(state) {
+        return state.options
+            .filter((option) => option.parentElement === state.results && !option.hidden)
+            .map((option) => option.querySelector("input[type='checkbox']"))
+            .filter(Boolean);
     }
 
     function initialize(root = document) {
@@ -49,6 +61,37 @@
             if (Object.values(state).some((value) => !value)) return;
             states.set(picker, state);
             state.search.addEventListener("input", () => render(picker));
+            state.search.addEventListener("keydown", (event) => {
+                if (event.key !== "ArrowDown") return;
+                const firstResult = visibleResultInputs(state)[0];
+                if (!firstResult) return;
+                event.preventDefault();
+                firstResult.focus();
+            });
+            state.results.addEventListener("mousedown", (event) => {
+                if (event.button === 0 && event.target.closest("[data-ingredient-option]")) {
+                    event.preventDefault();
+                }
+            });
+            state.results.addEventListener("keydown", (event) => {
+                if ([" ", "Spacebar", "Enter"].includes(event.key)) {
+                    const input = event.target.closest("input[type='checkbox']");
+                    if (!input) return;
+                    event.preventDefault();
+                    input.checked = !input.checked;
+                    input.dispatchEvent(new Event("change", { bubbles: true }));
+                    return;
+                }
+                if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
+                const inputs = visibleResultInputs(state);
+                const currentIndex = inputs.indexOf(event.target);
+                if (currentIndex < 0) return;
+                const nextIndex = event.key === "ArrowDown"
+                    ? Math.min(currentIndex + 1, inputs.length - 1)
+                    : Math.max(currentIndex - 1, 0);
+                event.preventDefault();
+                inputs[nextIndex].focus();
+            });
             picker.addEventListener("change", (event) => {
                 const input = event.target.closest("input[type='checkbox']");
                 if (input?.checked && input.dataset.exclusiveGroup) {

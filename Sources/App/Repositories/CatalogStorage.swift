@@ -1,16 +1,16 @@
 import Vapor
 
 private struct CatalogStorageKey: StorageKey {
-  typealias Value = Catalog
+  typealias Value = any CatalogRepository
 }
 
 extension Application {
-  var catalog: Catalog {
+  var catalogRepository: any CatalogRepository {
     get {
-      guard let catalog = storage[CatalogStorageKey.self] else {
-        fatalError("Catalog was not configured")
+      guard let repository = storage[CatalogStorageKey.self] else {
+        fatalError("Catalog repository was not configured")
       }
-      return catalog
+      return repository
     }
     set {
       storage[CatalogStorageKey.self] = newValue

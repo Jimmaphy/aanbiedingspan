@@ -12,6 +12,7 @@ final class AdminDatabaseTests: XCTestCase {
     }
 
     let application = try await Application.make(.testing)
+    addTeardownBlock { try await application.asyncShutdown() }
     try await configure(application)
     application.adminAuth = .init(
       username: "testbeheerder", passwordHash: try Bcrypt.hash("testwachtwoord", cost: 4),
@@ -22,8 +23,8 @@ final class AdminDatabaseTests: XCTestCase {
     let legacySupermarket = ManagedSupermarket(name: "Bestaande supermarkt")
     try await legacyIngredient.save(on: application.db)
     try await legacySupermarket.save(on: application.db)
-    let legacyOffer = ManagedOffer(
-      legacyIngredientID: try legacyIngredient.requireID(),
+    let legacyOffer = CreateOfferIngredients.LegacyOffer(
+      ingredientID: try legacyIngredient.requireID(),
       supermarketID: try legacySupermarket.requireID(), validFrom: Date(),
       validUntil: Date().addingTimeInterval(86_400))
     try await legacyOffer.save(on: application.db)
@@ -33,6 +34,8 @@ final class AdminDatabaseTests: XCTestCase {
       .filter(\.$offer.$id == legacyOffer.requireID()).all()
     XCTAssertEqual(backfilledLinks.map(\.$ingredient.id), [try legacyIngredient.requireID()])
     try await AddRecipeMediaAndPreferences().prepare(on: application.db)
+    try await AddPublishingStatus().prepare(on: application.db)
+    try await CreateContactInformation().prepare(on: application.db)
     let queriedDietaryPreference = try await ManagedDietaryPreference.query(on: application.db)
       .filter(\.$slug == "vegetarian").first()
     let dietaryPreference = try XCTUnwrap(queriedDietaryPreference)
@@ -66,15 +69,17 @@ final class AdminDatabaseTests: XCTestCase {
     let supermarket = try XCTUnwrap(queriedSupermarket)
     let source = try XCTUnwrap(queriedSource)
 
+    let activeFrom = AdminValidation.dateString(Date().addingTimeInterval(-86_400))
+    let activeUntil = AdminValidation.dateString(Date().addingTimeInterval(86_400))
     try await post(
       "/admin/offers",
       body:
-        "ingredientIDs%5B%5D=\(try ingredient.requireID())&ingredientIDs%5B%5D=\(try secondIngredient.requireID())&supermarketID=\(try supermarket.requireID())&validFrom=2026-07-31&validUntil=2026-08-02",
+        "ingredientIDs%5B%5D=\(try ingredient.requireID())&ingredientIDs%5B%5D=\(try secondIngredient.requireID())&supermarketID=\(try supermarket.requireID())&validFrom=\(activeFrom)&validUntil=\(activeUntil)&isPublished=on",
       session: session, to: application)
     try await post(
       "/admin/recipes",
       body:
-        "title=Testrecept-\(suffix)&summary=Een%20recept%20voor%20de%20databasetest.&sourceURL=https%3A%2F%2Fvoorbeeld.nl%2Frecept&durationMinutes=20&sourceID=\(try source.requireID())&ingredientIDs%5B%5D=\(try ingredient.requireID())&dietaryPreferenceIDs%5B%5D=\(try dietaryPreference.requireID())",
+        "title=Testrecept-\(suffix)&summary=Een%20recept%20voor%20de%20databasetest.&sourceURL=https%3A%2F%2Fvoorbeeld.nl%2Frecept&durationMinutes=20&sourceID=\(try source.requireID())&ingredientIDs%5B%5D=\(try ingredient.requireID())&dietaryPreferenceIDs%5B%5D=\(try dietaryPreference.requireID())&isPublished=on",
       session: session, to: application)
 
     let queriedCreatedRecipe = try await ManagedRecipe.query(on: application.db)
@@ -88,6 +93,7 @@ final class AdminDatabaseTests: XCTestCase {
     XCTAssertEqual(loadedRecipe.source.name, source.name)
     XCTAssertEqual(loadedRecipe.ingredients.map(\.name), [ingredient.name])
     XCTAssertEqual(loadedRecipe.dietaryPreferences.map(\.slug), ["vegetarian"])
+    XCTAssertTrue(loadedRecipe.isPublished)
     let offerCount = try await ManagedOffer.query(on: application.db).count()
     let queriedOffer = try await ManagedOffer.query(on: application.db)
       .filter(\.$supermarket.$id == supermarket.requireID()).with(\.$ingredients).first()
@@ -96,7 +102,33 @@ final class AdminDatabaseTests: XCTestCase {
     XCTAssertEqual(offerCount, 2)
     XCTAssertEqual(
       Set(loadedOffer.ingredients.map(\.name)), Set([ingredient.name, secondIngredient.name]))
+    XCTAssertTrue(loadedOffer.isPublished)
     XCTAssertEqual(auditCount, 6)
+
+    let draftRecipe = ManagedRecipe(
+      title: "Conceptrecept-\(suffix)", summary: "Dit recept mag niet openbaar zijn.",
+      sourceURL: "https://voorbeeld.nl/concept", durationMinutes: 15,
+      sourceID: try source.requireID())
+    try await draftRecipe.save(on: application.db)
+    try await ManagedRecipeIngredient(
+      recipeID: try draftRecipe.requireID(), ingredientID: try secondIngredient.requireID()
+    ).save(on: application.db)
+
+    application.catalogRepository = ManagedCatalogRepository()
+    let publicCatalog = try await application.catalogRepository.load(on: application.db)
+    XCTAssertEqual(publicCatalog.recipes.map(\.title), [recipe.title])
+    XCTAssertEqual(publicCatalog.offers.count, 2)
+    XCTAssertEqual(Set(publicCatalog.offers.map(\.ingredientID)).count, 2)
+
+    let publicSearch = try await application.sendRequest(
+      .POST, "/search",
+      beforeRequest: { request in
+        request.headers.contentType = .urlEncodedForm
+        request.body = .init(string: "supermarkets%5B%5D=\(try supermarket.requireID())")
+        await Task.yield()
+      })
+    XCTAssertContains(publicSearch.body.string, recipe.title)
+    XCTAssertFalse(publicSearch.body.string.contains(draftRecipe.title))
 
     let offerPage = try await get("/admin/offers", session: session, from: application)
     XCTAssertEqual(offerPage.status, .ok)
@@ -132,6 +164,34 @@ final class AdminDatabaseTests: XCTestCase {
     XCTAssertContains(recipeForm.body.string, "type=\"file\"")
     XCTAssertContains(recipeForm.body.string, "dietaryPreferenceIDs[]")
     XCTAssertContains(recipeForm.body.string, "data-ingredient-picker")
+    XCTAssertContains(recipeForm.body.string, "Publiceer dit recept")
+    XCTAssertFalse(recipeForm.body.string.contains("name=\"isPublished\" checked"))
+
+    let contactForm = try await get(
+      "/admin/contact-information", session: session, from: application)
+    XCTAssertEqual(contactForm.status, .ok)
+    XCTAssertContains(contactForm.body.string, "Openbaar e-mailadres")
+    XCTAssertFalse(contactForm.body.string.contains("value=\"contact@aanbiedingspan.nl\""))
+
+    let rejectedContactUpdate = try await application.sendRequest(
+      .POST, "/admin/contact-information",
+      beforeRequest: { request in
+        request.headers.contentType = .urlEncodedForm
+        request.headers.replaceOrAdd(name: .cookie, value: session.cookie)
+        request.body = .init(string: "email=hallo%40aanbiedingspan.nl")
+        await Task.yield()
+      })
+    XCTAssertEqual(rejectedContactUpdate.status, .forbidden)
+
+    try await post(
+      "/admin/contact-information", body: "email=hallo%40aanbiedingspan.nl",
+      session: session, to: application)
+    let contactRecord = try await ManagedContactInformation.find(
+      ManagedContactInformation.singletonID, on: application.db)
+    XCTAssertEqual(contactRecord?.email, "hallo@aanbiedingspan.nl")
+    application.contactInformationRepository = ManagedContactInformationRepository()
+    let managedAbout = try await application.sendRequest(.GET, "/about") { _ in await Task.yield() }
+    XCTAssertContains(managedAbout.body.string, "mailto:hallo@aanbiedingspan.nl")
 
     let inlineIngredientName = "Inline-testingredient-\(suffix)"
     let inlineResponse = try await application.sendRequest(
@@ -178,10 +238,11 @@ final class AdminDatabaseTests: XCTestCase {
     XCTAssertNil(activeIngredient)
     XCTAssertNotNil(deletedIngredient)
 
+    try await CreateContactInformation().revert(on: application.db)
+    try await AddPublishingStatus().revert(on: application.db)
     try await AddRecipeMediaAndPreferences().revert(on: application.db)
     try await CreateOfferIngredients().revert(on: application.db)
     try await CreateAdminCatalog().revert(on: application.db)
-    try await application.asyncShutdown()
   }
 
   private func login(to application: Application) async throws -> (cookie: String, csrf: String) {

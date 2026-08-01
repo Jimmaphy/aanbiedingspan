@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>#(pageTitle) · Aanbiedingspan</title>
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/app.css?v=2">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
@@ -12,12 +12,13 @@
         <a class="brand" href="/" aria-label="Aanbiedingspan, naar de startpagina"><img src="/images/aanbiedingspan-logo.svg" alt="" width="48" height="48">Aanbiedingspan</a>
     </header>
     <main id="main-content" class="content-page">
-        <p class="eyebrow">Onze voorraadgedachte</p>
+        <p class="eyebrow">De voorraadgedachte</p>
         <h1>Koken met wat er al is</h1>
         <p class="lead">Aanbiedingspan helpt je recepten te vinden met ingrediënten die je al hebt. Wat nog ontbreekt, zoeken we zoveel mogelijk bij aanbiedingen van de supermarkten die jij kiest.</p>
 
-        <h2>Onze missie</h2>
+        <h2>De missie</h2>
         <p>Eerst opmaken, dan slim aanvullen. Ingrediënten uit je eigen voorraad wegen daarom zwaarder dan aanbiedingen. Zo wordt kiezen makkelijker en belandt er hopelijk minder eten in de afvalbak.</p>
+        <p>Aanbiedingspan is onderdeel van Jimmaphy Media. Lees meer over het bedrijf op <a href="https://jimmaphy.nl" rel="external">jimmaphy.nl</a>.</p>
 
         <h2>Zo komt je match tot stand</h2>
         <p>We bekijken ieder ingrediënt van een recept en geven het punten:</p>
@@ -31,7 +32,7 @@
         <p>Gerechtswensen en ingrediënten die je uitsluit controleren we eerst. Een recept dat daar niet aan voldoet, komt niet in de resultaten.</p>
 
         <h2>Even overleggen?</h2>
-        <p>De contactadressen worden voor de publieke proef bevestigd. Tot die tijd staat er bewust geen werkend contactadres op deze demoversie.</p>
+        #if(contactEmail):<p>Heb je een vraag, een goed recept of zie je iets dat niet klopt? Mail naar <a href="mailto:#(contactEmail)">#(contactEmail)</a>.</p>#else:<p>De contactadressen worden voor de publieke proef bevestigd. Tot die tijd staat er bewust geen werkend contactadres op deze demoversie.</p>#endif
         <p><a class="button" href="/">Vind een recept</a></p>
     </main>
     <footer class="site-footer"><p>Eerst opmaken, dan slim aanvullen.</p><nav aria-label="Voettekst"><a href="/about">Over Aanbiedingspan</a><a href="/privacy">Privacy</a></nav></footer>

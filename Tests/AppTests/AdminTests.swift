@@ -17,6 +17,12 @@ final class AdminTests: XCTestCase {
     XCTAssertEqual(adminResponse.status, .seeOther)
     XCTAssertEqual(adminResponse.headers.first(name: .location), "/admin/login")
 
+    let contactResponse = try await application.sendRequest(.GET, "/admin/contact-information") {
+      _ in await Task.yield()
+    }
+    XCTAssertEqual(contactResponse.status, .seeOther)
+    XCTAssertEqual(contactResponse.headers.first(name: .location), "/admin/login")
+
     try await application.asyncShutdown()
   }
 
@@ -73,6 +79,7 @@ final class AdminTests: XCTestCase {
     XCTAssertContains(dashboard.body.string, "Aanbiedingen")
     XCTAssertContains(dashboard.body.string, "Receptbronnen")
     XCTAssertContains(dashboard.body.string, "Gerechtswensen")
+    XCTAssertContains(dashboard.body.string, "Contactgegevens")
 
     try await application.asyncShutdown()
   }
@@ -82,6 +89,8 @@ final class AdminTests: XCTestCase {
       try AdminValidation.webURL("https://voorbeeld.nl/recept", field: "de receptlink"),
       "https://voorbeeld.nl/recept")
     XCTAssertThrowsError(try AdminValidation.webURL("javascript:alert(1)", field: "de receptlink"))
+    XCTAssertEqual(try AdminValidation.email("hallo@aanbiedingspan.nl"), "hallo@aanbiedingspan.nl")
+    XCTAssertThrowsError(try AdminValidation.email("geen-adres"))
   }
 
   func testRecipeImagesAcceptOnlyBoundedRasterFormats() throws {

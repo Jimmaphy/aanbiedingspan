@@ -2,8 +2,9 @@ import Vapor
 
 struct PageController {
   func home(request: Request) async throws -> View {
+    let catalog = try await request.application.catalogRepository.load(on: request.db)
     let context = SearchPageContext(
-      catalog: request.application.catalog,
+      catalog: catalog,
       request: .empty,
       results: [],
       hasSearched: false
@@ -13,7 +14,7 @@ struct PageController {
 
   func search(request: Request) async throws -> View {
     let searchRequest = try request.content.decode(SearchRequest.self)
-    let catalog = request.application.catalog
+    let catalog = try await request.application.catalogRepository.load(on: request.db)
     let results: [RankedRecipe]
 
     do {
@@ -35,9 +36,11 @@ struct PageController {
   }
 
   func about(request: Request) async throws -> View {
-    try await request.view.render(
+    let contactEmail = try await request.application.contactInformationRepository.email(
+      on: request.db)
+    return try await request.view.render(
       "about",
-      InformationPageContext(pageTitle: "Over Aanbiedingspan")
+      InformationPageContext(pageTitle: "Over Aanbiedingspan", contactEmail: contactEmail)
     )
   }
 

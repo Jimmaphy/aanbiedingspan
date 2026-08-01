@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>#(pageTitle) · Aanbiedingspan</title>
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/app.css?v=2">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Ga naar de inhoud</a>
@@ -20,9 +20,7 @@
         <p>Om recepten te vinden sturen we je keuzes naar onze server. We gebruiken ze alleen om de resultaten voor dat moment te berekenen. We bewaren ze niet en maken geen bezoekersprofiel.</p>
 
         <h2 id="keuzes-bewaren">Je keuzes bewaren</h2>
-        <p>Vink je “Onthoud mijn keuzes” aan? Dan bewaren we je wizardkeuzes maximaal 90 dagen in <code>localStorage</code>. Dat is opslag in je eigen browser.</p>
-        <p>Zonder vinkje werkt Aanbiedingspan gewoon. Bij je volgende bezoek vul je de wizard opnieuw in. We onthouden een weigering niet.</p>
-        <p>Met “Wizard opnieuw starten” verwijder je de opgeslagen keuzes en de melding dat je toestemming gaf.</p>
+        <p>Vink je “Onthoud mijn keuzes” aan? Dan bewaren we je wizardkeuzes maximaal 90 dagen in <code>localStorage</code>. Dat is opslag in je eigen browser. Zonder vinkje werkt Aanbiedingspan gewoon. Bij je volgende bezoek vul je de wizard opnieuw in. We onthouden een weigering niet. Met “Wizard opnieuw starten” verwijder je de opgeslagen keuzes en de melding dat je toestemming gaf.</p>
 
         <h2>Cookies</h2>
         <p>Voor bezoekers gebruiken we geen tracking- of advertentiecookies. De optionele bewaarfunctie gebruikt <code>localStorage</code>, geen cookie.</p>

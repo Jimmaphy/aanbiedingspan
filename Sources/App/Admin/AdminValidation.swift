@@ -33,6 +33,24 @@ enum AdminValidation {
     return number
   }
 
+  static func email(_ value: String) throws -> String {
+    let email = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    let parts = email.split(separator: "@", omittingEmptySubsequences: false)
+    let allowedLocal = CharacterSet.alphanumerics.union(
+      CharacterSet(charactersIn: ".!#$%&'*+/=?^_`{|}~-"))
+    let allowedDomain = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: ".-"))
+    guard email.count <= 254, parts.count == 2,
+      !parts[0].isEmpty, parts[0].count <= 64,
+      parts[1].contains("."), !parts[1].hasPrefix("."), !parts[1].hasSuffix("."),
+      !email.contains(".."),
+      parts[0].unicodeScalars.allSatisfy(allowedLocal.contains),
+      parts[1].unicodeScalars.allSatisfy(allowedDomain.contains)
+    else {
+      throw Abort(.badRequest, reason: "Vul een geldig e-mailadres in.")
+    }
+    return email
+  }
+
   static func localDate(_ value: String, endOfDay: Bool = false) throws -> Date {
     let formatter = DateFormatter()
     formatter.calendar = Calendar(identifier: .gregorian)
