@@ -1,0 +1,11 @@
+www.{$DOMAIN} {
+	tls /etc/caddy/certs/aanbiedingspan.fullchain.pem /etc/caddy/certs/aanbiedingspan.key
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+{$DOMAIN} {
+	tls /etc/caddy/certs/aanbiedingspan.fullchain.pem /etc/caddy/certs/aanbiedingspan.key
+	encode zstd gzip
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	reverse_proxy app:8080
+}
